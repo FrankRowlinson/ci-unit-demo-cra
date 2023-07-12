@@ -1,7 +1,10 @@
 name: Run tests
+
 on:
   pull_request:
   workflow_dispatch:
+  workflow_call:
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -11,6 +14,16 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
       - name: Install deps
-        run: npm ci; npx playwright install --with-deps
+        run: npm ci; npx playwright install --with-deps chromium
       - name: Run tests
         run: npm run test-ci
+  get_url_to_results:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" > test_result_url.txt
+      - name: Create artifact with url
+        uses: actions/upload-artifact@v3
+        with:
+          name: result_url
+          path: test_result_url.txt
