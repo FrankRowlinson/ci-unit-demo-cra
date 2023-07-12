@@ -9,18 +9,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
       - name: Install deps
         run: npm ci; npx playwright install --with-deps chromium
       - name: Run tests
         run: npm run test-ci
-  get_url_to_results:
+  get-url-to-results:
     runs-on: ubuntu-latest
     steps:
-      - shell: bash
+      - name: Save url to .txt
+        shell: bash
         run: echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" > test_result_url.txt
       - name: Create artifact with url
         uses: actions/upload-artifact@v3
