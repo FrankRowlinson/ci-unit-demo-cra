@@ -3,6 +3,9 @@ on:
   push:
     tags: v*
   workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
 jobs:
   run_tests:
     uses: ./.github/workflows/run-tests.yml
@@ -15,7 +18,7 @@ jobs:
         with:
           name: result_url
       - shell: bash
-        run: echo "TEST_RESULTS=${cat test_result_url.txt}" >> $GITHUB_ENV
+        run: echo "TEST_RESULTS=$(cat test_result_url.txt)" >> $GITHUB_ENV
       - uses: JasonEtco/create-an-issue@v2
         env:
           TAG_NAME: $GITHUB_REF_NAME
