@@ -58,7 +58,7 @@ jobs:
         id: write-issue-id
         shell: bash
         run: |
-          echo "${{ steps.create-release-issue.outputs.number }}" > $GIT_REF_NAME.txt
+          echo "${{ steps.create-release-issue.outputs.number }}" > ${{ github.ref_name }}.txt
 
       - name: Save release issue id for use in other workflows
         uses: actions/upload-artifact@v3
