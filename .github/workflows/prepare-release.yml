@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - shell: bash
-        run: echo "::set-output name=branch-name::release-$(git describe --tags --abbrev=0)"
+        run: echo "::set-output name=branch-name::release-$($GIT_REF_NAME)"
         id: form-branch-name
       - uses: peterjgrainger/action-create-branch@v2.0.1
         env:
@@ -50,3 +50,14 @@ jobs:
         with:
           update_existing: true
           search_existing: all
+      - name: Write issue id in file
+        id: write-issue-id
+        shell: bash
+        run: |
+          echo "${{ steps.create-release-issue.outputs.number }}" > $($GIT_REF_NAME).txt
+          echo "::set-output name=file-name::$($GIT_REF_NAME).txt"
+      - name: Save release issue id for use in other workflows
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{env.GITHUB_REF_NAME }}
+          path: ${{ steps.write-issue-id.outputs.file-name }}
