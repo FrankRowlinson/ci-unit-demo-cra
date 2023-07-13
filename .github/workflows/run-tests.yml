@@ -4,12 +4,18 @@ on:
   pull_request:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      branch-name:
+        required: true
+        type: string
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch-name || ''}}
       - uses: actions/setup-node@v3
       - name: Install deps
         run: npm ci; npx playwright install --with-deps chromium
