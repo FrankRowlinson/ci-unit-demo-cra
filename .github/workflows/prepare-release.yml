@@ -34,12 +34,15 @@ jobs:
     needs: run_tests
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/download-artifact@v3
         with:
           name: result_url
+
       - name: Pull url to env variable
         shell: bash
         run: echo "TEST_RESULTS=$(cat test_result_url.txt)" >> $GITHUB_ENV
+
       - name: Create or update release issue
         id: create-release-issue
         uses: JasonEtco/create-an-issue@v2
@@ -50,14 +53,15 @@ jobs:
         with:
           update_existing: true
           search_existing: all
+
       - name: Write issue id in file
         id: write-issue-id
         shell: bash
         run: |
-          echo "${{ steps.create-release-issue.outputs.number }}" > $($GIT_REF_NAME).txt
-          echo "::set-output name=file-name::$($GIT_REF_NAME).txt"
+          echo "${{ steps.create-release-issue.outputs.number }}" > $GIT_REF_NAME.txt
+
       - name: Save release issue id for use in other workflows
         uses: actions/upload-artifact@v3
         with:
-          name: ${{env.GITHUB_REF_NAME }}
-          path: ${{ steps.write-issue-id.outputs.file-name }}
+          name: ${{ github.ref_name }}
+          path: ${{ github.ref_name }}.txt
