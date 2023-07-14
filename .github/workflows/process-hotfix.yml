@@ -10,6 +10,7 @@ jobs:
   create-hotfix-log:
     needs: run-tests
     if: success()
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,6 +28,7 @@ jobs:
       - shell: bash
         run: |
           cat << "EOF" > changelog.txt
+          ## Hotfix
           ${{ steps.changelog.outputs.changelog }}
           EOF
       - name: Find issue number
