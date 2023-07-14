@@ -10,6 +10,7 @@ jobs:
   create-hotfix-log:
     needs: run-tests
     if: success()
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
