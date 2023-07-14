@@ -33,7 +33,6 @@ jobs:
         with:
           labels: |
             release
-            ${{ steps.get-release-tag.outputs.release-tag }}
           state: open
         id: get-issue-number
         uses: micalevisk/last-issue-action@v2.0.0
