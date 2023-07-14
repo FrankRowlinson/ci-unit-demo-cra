@@ -5,7 +5,8 @@ on:
 jobs:
   run-tests:
     uses: "./.github/workflows/run-tests.yml"
-
+    with:
+      branch-name: ${{ github.ref_name }}
   create-hotfix-log:
     needs: run-tests
     if: success()
