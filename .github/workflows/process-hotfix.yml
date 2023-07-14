@@ -1,0 +1,44 @@
+name: Process hotfix
+on:
+  push:
+    branches: release-v\d+
+jobs:
+  run-tests:
+    uses: "./.github/workflows/run-tests.yml"
+
+  create-hotfix-log:
+    needs: run-tests
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - shell: bash
+        run: echo "::set-output name=release-tag::$(git describe --tags --abbrev=0)"
+        id: get-release-tag
+      - name: Create hotfix changelog
+        uses: mikepenz/release-changelog-builder-action@v4.0.0-rc02
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fromTag: ${{ steps.get-release-tag.outputs.release-tag }}
+          toTag: ${{ github.ref_name }}
+          outputFile: hotfix-changelog${{ steps.get-release-tag.outputs.release-tag }}.txt
+  update-issue-with-hotfix:
+    needs: create-hotfix-log
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - shell: bash
+        run: echo "::set-output name=release-tag::$(git describe --tags --abbrev=0)"
+        id: get-release-tag
+      - name: Download issue id artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ steps.get-release-tag.outputs.release-tag }}
+          path: ${{ steps.get-release-tag.outputs.release-tag }}.txt
+      - shell: bash
+        run: echo "::set-output name=issue-id::$(cat ${{ steps.get-release-tag.outputs.release-tag }}.txt)"
+        id: get-issue-id
+      - name: Create comment
+        run: gh issue comment ${{ steps.get-issue-id.outputs.issue-id }} -F hotfix-changelog${{ steps.get-release-tag.outputs.release-tag }}.txt

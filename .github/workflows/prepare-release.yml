@@ -12,22 +12,17 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
-      - shell: bash
-        run: echo "::set-output name=branch-name::release-$($GIT_REF_NAME)"
-        id: form-branch-name
       - uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: ${{ steps.form-branch-name.outputs.branch-name }}
-    outputs:
-      branch-name: ${{ steps.form-branch-name.outputs.branch-name }}
+          branch: release-${{ github.ref_name }}
 
   run_tests:
     needs: create-release-branch
     uses: ./.github/workflows/run-tests.yml
     with:
-      branch-name: ${{ needs.create-release-branch.outputs.branch-name }}
+      branch-name: release-${{ github.ref_name }}
 
   create-release-issue:
     runs-on: ubuntu-latest
