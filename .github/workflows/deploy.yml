@@ -1,0 +1,44 @@
+name: Deploy
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
+
+  update-and-close-issue:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Find issue number
+        id: get-issue-number
+        uses: micalevisk/last-issue-action@v2.0.0
+        with:
+          labels: |
+            release
+          state: open
+
+      - name: Create comment
+        run: gh issue close ${{ steps.get-issue-number.outputs.issue-number }} --comment "Deploy - ${{ env.URL_TO_PAGES }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          URL_TO_PAGES: https://${{ github.repository_owner }}.github.io/${{ github.repository }}
