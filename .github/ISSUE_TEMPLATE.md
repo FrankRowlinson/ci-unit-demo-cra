@@ -1,6 +1,6 @@
 ---
 title: RELEASE {{ env.GITHUB_REF_NAME }}
-labels: release
+labels: release, {{ env.GITHUB_REF_NAME }}
 ---
 
 Author: {{ env.GITHUB_ACTOR }}

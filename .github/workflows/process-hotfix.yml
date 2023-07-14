@@ -13,35 +13,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - shell: bash
-        run: echo "::set-output name=release-tag::$(git describe --tags --abbrev=0)"
-        id: get-release-tag
-      - name: Create hotfix changelog
-        uses: mikepenz/release-changelog-builder-action@v4.0.0-rc02
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          commitMode: true
-          fromTag: ${{ steps.get-release-tag.outputs.release-tag }}
-          toTag: ${{ github.ref_name }}
-          outputFile: hotfix-changelog${{ steps.get-release-tag.outputs.release-tag }}.txt
-  update-issue-with-hotfix:
-    needs: create-hotfix-log
-    if: success()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+          fetch-depth: 0
       - shell: bash
         run: echo "::set-output name=release-tag::$(git describe --tags --abbrev=0)"
         id: get-release-tag
-      - name: Find issue id
+      - name: Create changelog with hotfixes
+        uses: nielstenboom/semantic-changelog-generator@v1.2.0
+        id: changelog
+        with:
+          base: ${{ steps.get-release-tag.outputs.release-tag }}
+          head: ${{ github.ref_name }}
+      - shell: bash
+        run: |
+          cat << "EOF" > changelog.txt
+          ${{ steps.changelog.outputs.changelog }}
+          EOF
+      - name: Find issue number
         with:
           labels: |
             release
-          status: open
-        id: get-issue-id
+            ${{ steps.get-release-tag.outputs.release-tag }}
+          state: open
+        id: get-issue-number
         uses: micalevisk/last-issue-action@v2.0.0
       - name: Create comment
-        run: gh issue comment ${{ steps.get-issue-id.outputs.issue-number }} -F hotfix-changelog${{ steps.get-release-tag.outputs.release-tag }}.txt
+        run: gh issue comment ${{ steps.get-issue-number.outputs.issue-number }} -F changelog.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
