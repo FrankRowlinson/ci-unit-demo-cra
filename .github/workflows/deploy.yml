@@ -41,4 +41,4 @@ jobs:
         run: gh issue close ${{ steps.get-issue-number.outputs.issue-number }} --comment "Deploy - ${{ env.URL_TO_PAGES }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          URL_TO_PAGES: https://${{ github.repository_owner }}.github.io/${{ github.repository }}
+          URL_TO_PAGES: https://FrankRowlinson.github.io/ci-unit-demo-cra
