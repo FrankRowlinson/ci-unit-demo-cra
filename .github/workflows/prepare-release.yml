@@ -62,8 +62,3 @@ jobs:
         with:
           update_existing: true
           search_existing: all
-
-      - name: Label this issue with tag
-        run: gh issue edit ${{ steps.create-release-issue.outputs.number }} --add-label ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
