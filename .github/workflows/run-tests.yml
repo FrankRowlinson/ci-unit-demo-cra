@@ -8,6 +8,8 @@ on:
       branch-name:
         required: true
         type: string
+  push:
+    branches: master
 
 jobs:
   test:
